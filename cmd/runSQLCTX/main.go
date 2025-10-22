@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/google/uuid"
 	"github.com/jonilsonds9/goexpert-modulo-15-sqlc/internal/db"
 )
 
@@ -50,7 +51,7 @@ func (c *CourseDB) callTx(ctx context.Context, fn func(*db.Queries) error) error
 	return tx.Commit()
 }
 
-func (c *CourseDB) CreateCategory(ctx context.Context, argsCategory CategoryParams, argsCourse CourseParams) error {
+func (c *CourseDB) CreateCourseAndCategory(ctx context.Context, argsCategory CategoryParams, argsCourse CourseParams) error {
 	err := c.callTx(ctx, func(q *db.Queries) error {
 		var err error
 		err = q.CreateCategory(ctx, db.CreateCategoryParams{
@@ -87,6 +88,23 @@ func main() {
 	}
 	defer dbConn.Close()
 
-	queries := db.New(dbConn)
+	//queries := db.New(dbConn)
 
+	categoryArgs := CategoryParams{
+		ID:          uuid.New().String(),
+		Name:        "Databases",
+		Description: sql.NullString{String: "Courses about databases", Valid: true},
+	}
+
+	courseArgs := CourseParams{
+		ID:          uuid.New().String(),
+		Name:        "Introduction to SQLC",
+		Description: sql.NullString{String: "Learn how to use SQLC with Go", Valid: true},
+	}
+
+	courseDB := NewCourseDB(dbConn)
+	err = courseDB.CreateCourseAndCategory(ctx, categoryArgs, courseArgs)
+	if err != nil {
+		panic(err)
+	}
 }
