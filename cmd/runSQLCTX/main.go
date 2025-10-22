@@ -6,7 +6,6 @@ import (
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/google/uuid"
 	"github.com/jonilsonds9/goexpert-modulo-15-sqlc/internal/db"
 )
 
@@ -90,24 +89,38 @@ func main() {
 	}
 	defer dbConn.Close()
 
-	//queries := db.New(dbConn)
+	queries := db.New(dbConn)
 
-	categoryArgs := CategoryParams{
-		ID:          uuid.New().String(),
-		Name:        "Databases",
-		Description: sql.NullString{String: "Courses about databases", Valid: true},
-	}
-
-	courseArgs := CourseParams{
-		ID:          uuid.New().String(),
-		Name:        "Introduction to SQLC",
-		Description: sql.NullString{String: "Learn how to use SQLC with Go", Valid: true},
-		Price:       10.95,
-	}
-
-	courseDB := NewCourseDB(dbConn)
-	err = courseDB.CreateCourseAndCategory(ctx, categoryArgs, courseArgs)
+	courses, err := queries.ListCourses(ctx)
 	if err != nil {
 		panic(err)
 	}
+	for _, course := range courses {
+		fmt.Printf("Category: %s, Course ID: %s, Course Name %s, Course Description: %s, Price: %.2f\n",
+			course.CategoryName,
+			course.ID,
+			course.Name,
+			course.Description.String,
+			course.Price,
+		)
+	}
+
+	//categoryArgs := CategoryParams{
+	//	ID:          uuid.New().String(),
+	//	Name:        "Databases",
+	//	Description: sql.NullString{String: "Courses about databases", Valid: true},
+	//}
+	//
+	//courseArgs := CourseParams{
+	//	ID:          uuid.New().String(),
+	//	Name:        "Introduction to SQLC",
+	//	Description: sql.NullString{String: "Learn how to use SQLC with Go", Valid: true},
+	//	Price:       10.95,
+	//}
+	//
+	//courseDB := NewCourseDB(dbConn)
+	//err = courseDB.CreateCourseAndCategory(ctx, categoryArgs, courseArgs)
+	//if err != nil {
+	//	panic(err)
+	//}
 }
