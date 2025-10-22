@@ -26,6 +26,7 @@ type CourseParams struct {
 	ID          string
 	Name        string
 	Description sql.NullString
+	Price       float64
 }
 
 type CategoryParams struct {
@@ -68,6 +69,7 @@ func (c *CourseDB) CreateCourseAndCategory(ctx context.Context, argsCategory Cat
 			Name:        argsCourse.Name,
 			Description: argsCourse.Description,
 			CategoryID:  argsCategory.ID,
+			Price:       argsCourse.Price,
 		})
 		if err != nil {
 			return err
@@ -100,6 +102,7 @@ func main() {
 		ID:          uuid.New().String(),
 		Name:        "Introduction to SQLC",
 		Description: sql.NullString{String: "Learn how to use SQLC with Go", Valid: true},
+		Price:       10.95,
 	}
 
 	courseDB := NewCourseDB(dbConn)
